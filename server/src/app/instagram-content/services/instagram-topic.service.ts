@@ -15,8 +15,6 @@ export class InstagramTopicService {
     private geminiService: GeminiService,
   ) {}
 
-  // Jalankan otomatis setiap hari jam 00.00
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async generateTopics() {
     // Ambil semua category yang aktif
     const categories = await this.categoryService.findActive();

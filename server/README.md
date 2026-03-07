@@ -140,7 +140,6 @@ PUT /instagram/contents/:id/reject
 **Body:**
 ```json
 {
-  "status": "rejected",
   "rejectionReason": "Image not relevant to topic"
 }
 ```
@@ -189,6 +188,11 @@ All schedulers run automatically. Manual triggers are available for testing.
 
 | Time | Action |
 |------|--------|
-| 00:00 | Generate 1 topic per active category |
-| 01:00 | Generate caption + image from unused topic |
-| 09:00 | Auto publish all approved contents to Instagram |
+| 07:00 | Generate 1 topic per active category |
+| 08:00 | Generate content #1 (caption + anime-style image) |
+| 08:30 | Generate content #2 (caption + anime-style image) |
+| 09:00 | Generate content #3 (caption + anime-style image) |
+| 10:00 | Publish 1 approved content to Instagram |
+| 17:00 | Publish 1 approved content to Instagram |
+
+> **Note:** Contents must be manually audited (approved/rejected) between generation and publishing.

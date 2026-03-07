@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InstagramContentService } from './instagram-content/content.service';
 import { InstagramContentDbService } from './instagram-content/db.service';
 import { InstagramContentPublishService } from './instagram-content/publish.service';
+import { InstagramTopicService } from './instagram-topic.service';
 
 @Injectable()
 export class InstagramSchedulerService {
@@ -12,13 +13,25 @@ export class InstagramSchedulerService {
     private contentService: InstagramContentService,
     private dbService: InstagramContentDbService,
     private publishService: InstagramContentPublishService,
+    private topicService:InstagramTopicService
   ) {}
 
-  // Generate content 3x sehari: jam 07.00, 12.00, 17.00
-  @Cron('0 7 * * *')
-  @Cron('0 12 * * *')
-  @Cron('0 17 * * *')
-  async handleGenerateContent() {
+  @Cron('0 8 * * *')
+  async handleGenerateContentFirst() {
+    await this.handleGenerateContent();
+  }
+
+  @Cron('30 8 * * *')
+  async handleGenerateContentSecond() {
+    await this.handleGenerateContent();
+  }
+
+  @Cron('0 9 * * *')
+  async handleGenerateContentThird() {
+    await this.handleGenerateContent();
+  }
+
+  private async handleGenerateContent() {
     this.logger.log('Scheduler: Generating content...');
     try {
       const content = await this.contentService.generateContent();
@@ -28,12 +41,12 @@ export class InstagramSchedulerService {
     }
   }
 
-  @Cron('0 9 * * *')
+  @Cron(CronExpression.EVERY_DAY_AT_10AM)
   async handleMorningPublish() {
     await this.publishOneApprovedContent();
   }
 
-  @Cron('0 19 * * *')
+  @Cron(CronExpression.EVERY_DAY_AT_5PM)
   async handleEveningPublish() {
     await this.publishOneApprovedContent();
   }
@@ -55,6 +68,17 @@ export class InstagramSchedulerService {
       this.logger.log(`Published content: ${content._id}`);
     } catch (error) {
       this.logger.error(`Scheduler publish error: ${error.message}`);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_7AM)
+  async handleGenerateTopics() {
+    this.logger.log('Scheduler: Generating topics...');
+    try {
+      await this.topicService.generateTopics();
+      this.logger.log('Topics generated successfully');
+    } catch (error) {
+      this.logger.error(`Failed to generate topics: ${error.message}`);
     }
   }
 }
