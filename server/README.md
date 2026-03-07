@@ -182,6 +182,51 @@ DELETE /instagram/contents/:id
 
 ---
 
+## Running the App
+
+### Prerequisites
+- Node.js 18+
+- PM2 (`npm install -g pm2`)
+
+### Build
+```bash
+npm run build
+```
+
+### Start with PM2
+```bash
+pm2 start ecosystem.config.js --env production
+```
+
+### PM2 Commands
+```bash
+pm2 status                        # Check app status
+pm2 logs automation               # View logs
+pm2 restart automation            # Restart app
+pm2 stop automation               # Stop app
+pm2 delete automation             # Remove app from PM2
+pm2 stop all                      # Stop all apps
+pm2 delete all                    # Remove all apps from PM2
+```
+
+### Auto-start on Windows (Task Scheduler)
+1. Create `start-automation.bat` in project root:
+```bat
+@echo off
+cd /d D:\path\to\your\project
+pm2 start ecosystem.config.js --env production
+```
+2. Open Task Scheduler (`taskschd.msc`)
+3. Create Basic Task → Trigger: **When I log on** → Action: run `start-automation.bat`
+
+### Environment
+| File | Port | Usage |
+|------|------|-------|
+| `.env` | 3000 | Development |
+| `ecosystem.config.js` (env_production) | 9000 | Production |
+
+---
+
 ## Scheduler
 
 All schedulers run automatically. Manual triggers are available for testing.
