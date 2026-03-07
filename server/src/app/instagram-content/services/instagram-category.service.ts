@@ -32,7 +32,9 @@ export class InstagramCategoryService {
     id: string,
     data: Partial<InstagramCategory>,
   ): Promise<InstagramCategory> {
-    return this.categoryModel.findByIdAndUpdate(id, data, { new: true }).exec();
+    return this.categoryModel
+      .findByIdAndUpdate(id, data, { returnDocument: 'after' })
+      .exec();
   }
 
   async remove(id: string): Promise<InstagramCategory> {

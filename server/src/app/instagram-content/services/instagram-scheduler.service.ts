@@ -13,21 +13,26 @@ export class InstagramSchedulerService {
     private contentService: InstagramContentService,
     private dbService: InstagramContentDbService,
     private publishService: InstagramContentPublishService,
-    private topicService:InstagramTopicService
+    private topicService: InstagramTopicService,
   ) {}
 
-  @Cron('0 8 * * *')
-  async handleGenerateContentFirst() {
-    await this.handleGenerateContent();
-  }
+  // @Cron('0 8 * * *')
+  // async handleGenerateContentFirst() {
+  //   await this.handleGenerateContent();
+  // }
 
-  @Cron('30 8 * * *')
-  async handleGenerateContentSecond() {
-    await this.handleGenerateContent();
-  }
+  // @Cron('30 8 * * *')
+  // async handleGenerateContentSecond() {
+  //   await this.handleGenerateContent();
+  // }
 
-  @Cron('0 9 * * *')
-  async handleGenerateContentThird() {
+  // @Cron('0 9 * * *')
+  // async handleGenerateContentThird() {
+  //   await this.handleGenerateContent();
+  // }
+
+  @Cron('0,30 7-19 * * *')
+  async generateContent() {
     await this.handleGenerateContent();
   }
 
