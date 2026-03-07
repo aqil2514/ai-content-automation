@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { InstagramContentService } from './instagram-content.service';
+import { InstagramContentService } from './instagram-content/content.service';
 
 @Injectable()
 export class InstagramSchedulerService {

@@ -17,7 +17,7 @@ import { InstagramCategoryService } from './services/instagram-category.service'
 import { InstagramTopicService } from './services/instagram-topic.service';
 import { InstagramTopicController } from './controllers/instagram-topic.controller';
 import { InstagramContentController } from './controllers/instagram-content.controller';
-import { InstagramContentService } from './services/instagram-content.service';
+import { InstagramContentService } from './services/instagram-content/content.service';
 import { InstagramModule } from '../instagram/instagram.module';
 import { InstagramSchedulerService } from './services/instagram-scheduler.service';
 import { InstagramContentDbService } from './services/instagram-content/db.service';

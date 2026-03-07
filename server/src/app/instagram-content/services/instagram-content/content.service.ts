@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { InstagramContent } from '../schemas/instagram-content.schema';
-import { InstagramTopicService } from './instagram-topic.service';
+import { InstagramContent } from '../../schemas/instagram-content.schema';
+import { InstagramTopicService } from '../instagram-topic.service';
 import { GeminiService } from 'src/ai/gemini/gemini.service';
 import { ImagenService } from 'src/ai/imagen/imagen.service';
 import { CloudinaryService } from 'src/services/cloudinary/cloudinary.service';
 import { InstagramService } from 'src/app/instagram/instagram.service';
-import { InstagramTopic } from '../schemas/instagram-topic.schema';
+import { InstagramTopic } from '../../schemas/instagram-topic.schema';
 
 @Injectable()
 export class InstagramContentService {

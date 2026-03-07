@@ -8,7 +8,7 @@ import {
   Param,
   Query,
 } from '@nestjs/common';
-import { InstagramContentService } from '../services/instagram-content.service';
+import { InstagramContentService } from '../services/instagram-content/content.service';
 import { UpdateStatusDto } from '../dto/update-status.dto';
 import { InstagramContentDbService } from '../services/instagram-content/db.service';
 import { InstagramContentPublishService } from '../services/instagram-content/publish.service';
