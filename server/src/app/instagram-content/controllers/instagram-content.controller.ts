@@ -10,10 +10,16 @@ import {
 } from '@nestjs/common';
 import { InstagramContentService } from '../services/instagram-content.service';
 import { UpdateStatusDto } from '../dto/update-status.dto';
+import { InstagramContentDbService } from '../services/instagram-content/db.service';
+import { InstagramContentPublishService } from '../services/instagram-content/publish.service';
 
 @Controller('instagram/contents')
 export class InstagramContentController {
-  constructor(private readonly contentService: InstagramContentService) {}
+  constructor(
+    private readonly contentService: InstagramContentService,
+    private readonly dbService: InstagramContentDbService,
+    private readonly publishService: InstagramContentPublishService
+  ) {}
 
   @Post('generate')
   generate() {
@@ -22,46 +28,46 @@ export class InstagramContentController {
 
   @Get()
   findAll() {
-    return this.contentService.findAll();
+    return this.dbService.findAll();
   }
 
   @Get('status')
   findByStatus(@Query('value') status: string) {
-    return this.contentService.findByStatus(status);
+    return this.dbService.findByStatus(status);
   }
 
   @Get('pending')
   findPending() {
-    return this.contentService.findPending();
+    return this.dbService.findPending();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.contentService.findOne(id);
+    return this.dbService.findOne(id);
   }
 
   @Put(':id/approve')
   approve(@Param('id') id: string) {
-    return this.contentService.approve(id);
+    return this.dbService.approve(id);
   }
 
   @Put(':id/reject')
   reject(@Param('id') id: string, @Body() dto: UpdateStatusDto) {
-    return this.contentService.reject(id, dto.rejectionReason);
+    return this.dbService.reject(id, dto.rejectionReason);
   }
 
   @Put(':id/status')
   updateStatus(@Param('id') id: string, @Body('status') status: string) {
-    return this.contentService.updateStatus(id, status);
+    return this.dbService.updateStatus(id, status);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.contentService.remove(id);
+    return this.dbService.remove(id);
   }
 
   @Put(':id/publish')
   publishToInstagram(@Param('id') id: string) {
-    return this.contentService.publishToInstagram(id);
+    return this.publishService.publishToInstagram(id);
   }
 }

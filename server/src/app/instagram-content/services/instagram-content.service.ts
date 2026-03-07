@@ -7,6 +7,7 @@ import { GeminiService } from 'src/ai/gemini/gemini.service';
 import { ImagenService } from 'src/ai/imagen/imagen.service';
 import { CloudinaryService } from 'src/services/cloudinary/cloudinary.service';
 import { InstagramService } from 'src/app/instagram/instagram.service';
+import { InstagramTopic } from '../schemas/instagram-topic.schema';
 
 @Injectable()
 export class InstagramContentService {
@@ -17,21 +18,21 @@ export class InstagramContentService {
     private aiService: GeminiService,
     private imagenService: ImagenService,
     private cloudinaryService: CloudinaryService,
-    private instagramService: InstagramService,
   ) {}
 
-  async generateContent(): Promise<InstagramContent> {
+  private async getUnusedTopics(): Promise<InstagramTopic[]> {
     const unusedTopics = await this.topicService.findUnused();
     if (unusedTopics.length === 0) {
       throw new Error('No unused topics available.');
     }
 
-    const topic = unusedTopics[Math.floor(Math.random() * unusedTopics.length)];
+    return unusedTopics;
+  }
 
-    // Generate caption
+  private async generateCaption(topicTitle: string) {
     const captionPrompt = `
       Kamu adalah content creator Instagram profesional.
-      Buat caption Instagram yang menarik untuk topik: "${topic.title}"
+      Buat caption Instagram yang menarik untuk topik: "${topicTitle}"
       - Panjang 150-300 karakter
       - Bahasa Indonesia santai dan friendly
       - Tambahkan 5-10 hashtag relevan di akhir
@@ -40,24 +41,39 @@ export class InstagramContentService {
     `;
     const caption = await this.aiService.generateText(captionPrompt);
 
-    // Generate image prompt
+    return caption;
+  }
+
+  private async generateImagePrompt(topicTitle: string) {
     const imagePromptText = `
       Buat prompt bahasa Inggris untuk generate gambar Instagram
-      yang relevan dengan topik: "${topic.title}"
+      yang relevan dengan topik: "${topicTitle}"
       Respond hanya dengan prompt gambarnya saja, maksimal 100 kata.
     `;
     const imagePrompt = await this.aiService.generateText(imagePromptText);
 
-    // Generate gambar via Imagen
-    const base64Image = await this.imagenService.generateImage(imagePrompt.trim());
+    return imagePrompt;
+  }
 
-    // Upload ke Cloudinary
+  async generateContent(): Promise<InstagramContent> {
+    const unusedTopics = await this.getUnusedTopics();
+
+    const topic = unusedTopics[Math.floor(Math.random() * unusedTopics.length)];
+
+    const [caption, imagePrompt] = await Promise.all([
+      this.generateCaption(topic.title),
+      this.generateImagePrompt(topic.title),
+    ]);
+
+    const base64Image = await this.imagenService.generateImage(
+      imagePrompt.trim(),
+    );
+
     const imageUrl = await this.cloudinaryService.uploadBase64(
       base64Image,
       'instagram-content',
     );
 
-    // Simpan content
     const content = await this.contentModel.create({
       topic: topic._id,
       caption: caption.trim(),
@@ -68,80 +84,5 @@ export class InstagramContentService {
     await this.topicService.markAsUsed(topic._id.toString());
 
     return content;
-  }
-
-  async findAll(): Promise<InstagramContent[]> {
-    return this.contentModel.find().populate('topic').exec();
-  }
-
-  async findByStatus(status: string): Promise<InstagramContent[]> {
-    return this.contentModel.find({ status }).populate('topic').exec();
-  }
-
-  async findOne(id: string): Promise<InstagramContent> {
-    return this.contentModel.findById(id).populate('topic').exec();
-  }
-
-  async updateStatus(id: string, status: string): Promise<InstagramContent> {
-    return this.contentModel
-      .findByIdAndUpdate(id, { status }, { new: true })
-      .exec();
-  }
-
-  async remove(id: string): Promise<InstagramContent> {
-    return this.contentModel.findByIdAndDelete(id).exec();
-  }
-
-  async approve(id: string): Promise<InstagramContent> {
-    return this.contentModel
-      .findByIdAndUpdate(id, { status: 'approved' }, { new: true })
-      .populate('topic')
-      .exec();
-  }
-
-  async reject(id: string, rejectionReason: string): Promise<InstagramContent> {
-    return this.contentModel
-      .findByIdAndUpdate(
-        id,
-        { status: 'rejected', rejectionReason },
-        { new: true },
-      )
-      .populate('topic')
-      .exec();
-  }
-
-  async findPending(): Promise<InstagramContent[]> {
-    return this.contentModel
-      .find({ status: 'pending' })
-      .populate('topic')
-      .exec();
-  }
-
-  async publishToInstagram(id: string): Promise<InstagramContent> {
-    const content = await this.contentModel.findById(id).exec();
-
-    if (!content) throw new Error('Content not found');
-    if (content.status !== 'approved') {
-      throw new Error('Content must be approved before publishing');
-    }
-    if (!content.imageUrl) {
-      throw new Error('Content must have an image before publishing');
-    }
-
-    const { postId, postUrl } = await this.instagramService.publishPost(
-      content.imageUrl,
-      content.caption,
-    );
-
-    return this.contentModel.findByIdAndUpdate(
-      id,
-      {
-        status: 'published',
-        instagramPostId: postId,
-        instagramPostUrl: postUrl,
-        publishedAt: new Date(),
-      },
-      { new: true },
-    ).exec();
   }
 }

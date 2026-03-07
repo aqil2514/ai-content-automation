@@ -20,6 +20,8 @@ import { InstagramContentController } from './controllers/instagram-content.cont
 import { InstagramContentService } from './services/instagram-content.service';
 import { InstagramModule } from '../instagram/instagram.module';
 import { InstagramSchedulerService } from './services/instagram-scheduler.service';
+import { InstagramContentDbService } from './services/instagram-content/db.service';
+import { InstagramContentPublishService } from './services/instagram-content/publish.service';
 
 @Module({
   imports: [
@@ -39,7 +41,11 @@ import { InstagramSchedulerService } from './services/instagram-scheduler.servic
   providers: [
     InstagramCategoryService,
     InstagramTopicService,
+
     InstagramContentService,
+    InstagramContentDbService,
+    InstagramContentPublishService,
+
     InstagramSchedulerService
   ],
 })
