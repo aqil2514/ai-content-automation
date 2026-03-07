@@ -1,15 +1,23 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InstagramContentService } from './instagram-content/content.service';
+import { InstagramContentDbService } from './instagram-content/db.service';
+import { InstagramContentPublishService } from './instagram-content/publish.service';
 
 @Injectable()
 export class InstagramSchedulerService {
   private readonly logger = new Logger(InstagramSchedulerService.name);
 
-  constructor(private contentService: InstagramContentService) {}
+  constructor(
+    private contentService: InstagramContentService,
+    private dbService: InstagramContentDbService,
+    private publishService: InstagramContentPublishService,
+  ) {}
 
-  // Setiap hari jam 01.00 → generate content
-  @Cron('0 1 * * *')
+  // Generate content 3x sehari: jam 07.00, 12.00, 17.00
+  @Cron('0 7 * * *')
+  @Cron('0 12 * * *')
+  @Cron('0 17 * * *')
   async handleGenerateContent() {
     this.logger.log('Scheduler: Generating content...');
     try {
@@ -20,26 +28,31 @@ export class InstagramSchedulerService {
     }
   }
 
-  // Setiap hari jam 09.00 → publish semua yang approved
   @Cron('0 9 * * *')
-  async handlePublishApprovedContent() {
+  async handleMorningPublish() {
+    await this.publishOneApprovedContent();
+  }
+
+  @Cron('0 19 * * *')
+  async handleEveningPublish() {
+    await this.publishOneApprovedContent();
+  }
+
+  private async publishOneApprovedContent() {
     this.logger.log('Scheduler: Publishing approved content...');
     try {
-      const approvedContents = await this.contentService.findByStatus('approved');
+      const approvedContents = await this.dbService.findByStatus('approved');
 
       if (approvedContents.length === 0) {
         this.logger.log('No approved content to publish');
         return;
       }
 
-      for (const content of approvedContents) {
-        try {
-          await this.contentService.publishToInstagram(content._id.toString());
-          this.logger.log(`Published content: ${content._id}`);
-        } catch (error) {
-          this.logger.error(`Failed to publish content ${content._id}: ${error.message}`);
-        }
-      }
+      // Ambil 1 konten terlama yang sudah approved (FIFO)
+      const content = approvedContents[0];
+
+      await this.publishService.publishToInstagram(content._id.toString());
+      this.logger.log(`Published content: ${content._id}`);
     } catch (error) {
       this.logger.error(`Scheduler publish error: ${error.message}`);
     }

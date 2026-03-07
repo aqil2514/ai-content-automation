@@ -6,7 +6,6 @@ import { InstagramTopicService } from '../instagram-topic.service';
 import { GeminiService } from 'src/ai/gemini/gemini.service';
 import { ImagenService } from 'src/ai/imagen/imagen.service';
 import { CloudinaryService } from 'src/services/cloudinary/cloudinary.service';
-import { InstagramService } from 'src/app/instagram/instagram.service';
 import { InstagramTopic } from '../../schemas/instagram-topic.schema';
 
 @Injectable()
@@ -31,28 +30,43 @@ export class InstagramContentService {
 
   private async generateCaption(topicTitle: string) {
     const captionPrompt = `
-      Kamu adalah content creator Instagram profesional.
-      Buat caption Instagram yang menarik untuk topik: "${topicTitle}"
-      - Panjang 150-300 karakter
-      - Bahasa Indonesia santai dan friendly
-      - Tambahkan 5-10 hashtag relevan di akhir
-      - Gunakan emoji yang sesuai
-      Respond hanya dengan caption saja.
-    `;
+    You are a professional Instagram content creator and anime enthusiast.
+    Create an engaging Instagram caption for the topic: "${topicTitle}"
+    
+    Requirements:
+    - Length 150-300 characters
+    - Casual and friendly English
+    - Write as if this caption accompanies a beautiful anime illustration
+    - Can be an inspirational quote, short storytelling, or call to interaction
+    - Add 5-10 relevant hashtags at the end (mix of general and anime-related)
+    - Use aesthetic and fitting emojis
+    
+    Respond with the caption only.
+  `;
     const caption = await this.aiService.generateText(captionPrompt);
-
     return caption;
   }
 
-  private async generateImagePrompt(topicTitle: string) {
-    const imagePromptText = `
-      Buat prompt bahasa Inggris untuk generate gambar Instagram
-      yang relevan dengan topik: "${topicTitle}"
-      Respond hanya dengan prompt gambarnya saja, maksimal 100 kata.
-    `;
-    const imagePrompt = await this.aiService.generateText(imagePromptText);
+  async generateImagePrompt(topicTitle: string): Promise<string> {
+    const prompt = `
+    Create an English image generation prompt for an Instagram post about: "${topicTitle}"
 
-    return imagePrompt;
+    The image must follow this exact style:
+    - High quality anime illustration, similar to Genshin Impact or premium anime game art style
+    - Female anime character with detailed design: colorful unique hair with accessories, expressive large eyes, beautiful facial features
+    - Character outfit must match the scene and topic (can be casual, fantasy, traditional, formal, seasonal, etc.)
+    - Dramatic and cinematic lighting (golden hour, magical glow, sunlight rays, candlelight, etc.)
+    - Highly detailed and expansive background that matches the topic (landscape, fantasy world, cityscape, nature, etc.)
+    - Vivid colors with high saturation, rich and vibrant color palette
+    - Dynamic composition with character in foreground and stunning scenery in background
+    - Sparkles, light particles, or magical effects where appropriate
+    - Square format 1:1, Instagram ready
+
+    Respond with the image prompt only in English, maximum 120 words.
+  `;
+
+    const imagePrompt = await this.aiService.generateText(prompt);
+    return imagePrompt.trim();
   }
 
   async generateContent(): Promise<InstagramContent> {
@@ -74,14 +88,14 @@ export class InstagramContentService {
       'instagram-content',
     );
 
+    await this.topicService.markAsUsed(topic._id.toString());
+
     const content = await this.contentModel.create({
       topic: topic._id,
       caption: caption.trim(),
       imageUrl,
       status: 'pending',
     });
-
-    await this.topicService.markAsUsed(topic._id.toString());
 
     return content;
   }

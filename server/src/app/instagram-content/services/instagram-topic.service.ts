@@ -29,13 +29,19 @@ export class InstagramTopicService {
     // Generate 1 topic per category
     for (const category of categories) {
       const prompt = `
-        Kamu adalah content creator Instagram profesional.
-        Berikan 1 ide topik konten Instagram yang spesifik, menarik, dan relevan
-        untuk kategori "${category.name}".
-        ${category.description ? `Konteks kategori: ${category.description}` : ''}
-        
-        Respond hanya dengan judul topiknya saja, tanpa penjelasan tambahan.
-      `;
+  You are a professional anime-themed Instagram content creator.
+  Generate 1 specific, creative, and engaging Instagram content topic
+  for the category: "${category.name}".
+  ${category.description ? `Category context: ${category.description}` : ''}
+
+  The topic must be:
+  - Suitable for an anime illustration image post
+  - Evocative and visual — something that can be beautifully depicted in anime art style
+  - Specific enough to inspire a unique scene or character concept
+  - Relevant to the category context
+
+  Respond with the topic title only, no explanation.
+`;
 
       const title = await this.geminiService.generateText(prompt);
 
