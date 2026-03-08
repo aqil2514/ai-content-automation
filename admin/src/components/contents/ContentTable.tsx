@@ -57,7 +57,7 @@ export function ContentTable({
                 {content.imageUrl ? (
                   <Image
                     src={content.imageUrl}
-                    alt={content.topic?.topic ?? "Content Image"}
+                    alt={content.topic?.title ?? "Content Image"}
                     fill
                     className="object-cover"
                   />
@@ -72,7 +72,7 @@ export function ContentTable({
             {/* Topic */}
             <TableCell>
               <p className="text-sm font-medium max-w-40 truncate">
-                {content.topic.topic}
+                {content.topic.title}
               </p>
               <p className="text-xs text-muted-foreground">
                 {content.topic.category?.name}
