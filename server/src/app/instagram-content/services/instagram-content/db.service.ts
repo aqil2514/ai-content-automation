@@ -24,7 +24,7 @@ export class InstagramContentDbService {
   
     async updateStatus(id: string, status: string): Promise<InstagramContent> {
       return this.contentModel
-        .findByIdAndUpdate(id, { status }, { new: true })
+        .findByIdAndUpdate(id, { status }, { returnDocument:"after" })
         .exec();
     }
   
@@ -34,7 +34,7 @@ export class InstagramContentDbService {
   
     async approve(id: string): Promise<InstagramContent> {
       return this.contentModel
-        .findByIdAndUpdate(id, { status: 'approved' }, { new: true })
+        .findByIdAndUpdate(id, { status: 'approved' }, { returnDocument: "after" })
         .populate('topic')
         .exec();
     }
@@ -44,7 +44,7 @@ export class InstagramContentDbService {
         .findByIdAndUpdate(
           id,
           { status: 'rejected', rejectionReason },
-          { new: true },
+          { returnDocument:"after" },
         )
         .populate('topic')
         .exec();

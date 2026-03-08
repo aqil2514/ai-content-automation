@@ -63,7 +63,7 @@ export class InstagramTopicService {
 
   async markAsUsed(id: string): Promise<InstagramTopic> {
     return this.topicModel
-      .findByIdAndUpdate(id, { isUsed: true }, { new: true })
+      .findByIdAndUpdate(id, { isUsed: true }, { returnDocument: "after" })
       .exec();
   }
 

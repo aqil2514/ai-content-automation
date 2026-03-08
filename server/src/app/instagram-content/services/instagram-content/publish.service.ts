@@ -40,7 +40,7 @@ export class InstagramContentPublishService {
           instagramPostUrl: postUrl,
           publishedAt: new Date(),
         },
-        { new: true },
+        { returnDocument:"after" },
       )
       .exec();
   }
