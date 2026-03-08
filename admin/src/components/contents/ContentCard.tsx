@@ -30,7 +30,7 @@ export function ContentCard({
         {content.imageUrl ? (
           <Image
             src={content.imageUrl}
-            alt={content.topic?.topic ?? "Content Image"}
+            alt={content.topic?.title ?? "Content Image"}
             fill
             className="object-cover"
           />
@@ -44,7 +44,7 @@ export function ContentCard({
       <CardContent className="flex-1 flex flex-col gap-2 p-4">
         {/* Topic */}
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-          {content.topic.topic}
+          {content.topic.title}
         </p>
 
         {/* Caption */}

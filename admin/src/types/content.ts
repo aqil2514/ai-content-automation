@@ -11,7 +11,7 @@ export interface Category {
 
 export interface Topic {
   _id: string
-  topic: string
+  title: string
   category: Category
   isUsed: boolean
   createdAt: string

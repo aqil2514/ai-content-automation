@@ -43,7 +43,7 @@ export function ContentDetailDialog({
             {content.imageUrl ? (
               <Image
                 src={content.imageUrl}
-                alt={content.topic?.topic ?? "Content image"}
+                alt={content.topic?.title ?? "Content image"}
                 fill
                 className="object-cover"
               />
@@ -73,7 +73,7 @@ export function ContentDetailDialog({
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 Topic
               </p>
-              <p className="text-sm font-medium">{content.topic.topic}</p>
+              <p className="text-sm font-medium">{content.topic.title}</p>
               <p className="text-xs text-muted-foreground">
                 {content.topic.category?.name}
               </p>
