@@ -16,25 +16,11 @@ export class InstagramSchedulerService {
     private topicService: InstagramTopicService,
   ) {}
 
-  // @Cron('0 8 * * *')
-  // async handleGenerateContentFirst() {
+  // KREDIT GRATISAN ABIS CUY
+  // @Cron(CronExpression.EVERY_30_MINUTES)
+  // async generateContent() {
   //   await this.handleGenerateContent();
   // }
-
-  // @Cron('30 8 * * *')
-  // async handleGenerateContentSecond() {
-  //   await this.handleGenerateContent();
-  // }
-
-  // @Cron('0 9 * * *')
-  // async handleGenerateContentThird() {
-  //   await this.handleGenerateContent();
-  // }
-
-  @Cron('0,30 7-19 * * *')
-  async generateContent() {
-    await this.handleGenerateContent();
-  }
 
   private async handleGenerateContent() {
     this.logger.log('Scheduler: Generating content...');
@@ -46,7 +32,7 @@ export class InstagramSchedulerService {
     }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_10AM)
+  @Cron(CronExpression.EVERY_DAY_AT_7AM)
   async handleMorningPublish() {
     await this.publishOneApprovedContent();
   }
@@ -66,9 +52,7 @@ export class InstagramSchedulerService {
         return;
       }
 
-      // Ambil 1 konten terlama yang sudah approved (FIFO)
       const content = approvedContents[0];
-
       await this.publishService.publishToInstagram(content._id.toString());
       this.logger.log(`Published content: ${content._id}`);
     } catch (error) {
@@ -76,14 +60,15 @@ export class InstagramSchedulerService {
     }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_7AM)
-  async handleGenerateTopics() {
-    this.logger.log('Scheduler: Generating topics...');
-    try {
-      await this.topicService.generateTopics();
-      this.logger.log('Topics generated successfully');
-    } catch (error) {
-      this.logger.error(`Failed to generate topics: ${error.message}`);
-    }
-  }
+  // KREDIT GRATISAN ABIS CUY
+  // @Cron(CronExpression.EVERY_6_HOURS)
+  // async handleGenerateTopics() {
+  //   this.logger.log('Scheduler: Generating topics...');
+  //   try {
+  //     await this.topicService.generateTopics();
+  //     this.logger.log('Topics generated successfully');
+  //   } catch (error) {
+  //     this.logger.error(`Failed to generate topics: ${error.message}`);
+  //   }
+  // }
 }
